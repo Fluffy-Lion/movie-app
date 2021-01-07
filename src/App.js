@@ -5,6 +5,7 @@ import MovieList from './components/MovieList'
 import MovieListHeading from './components/MovieListHeading'
 import SearchBox from './components/SearchBox'
 import AddToFavourites from './components/AddToFavourites'
+import RemoveFavourites from './components/RemoveFavourites';
 
 const App = () => {
   //    currentstate , function that updates it
@@ -25,6 +26,13 @@ const App = () => {
 
   const addFavouriteMovie = (movie) => {
     const newFavouriteList = [...favourites, movie]
+    setFavourites(newFavouriteList)
+  }
+
+  const removeFavouriteMovie = (movie) => {
+    const newFavouriteList = favourites.filter(
+      (favourite) => favourite.imdbID !== movie.imdbID
+    )
     setFavourites(newFavouriteList)
   }
   //side effect, makes the call only one time
@@ -48,7 +56,11 @@ const App = () => {
         <MovieListHeading heading='favourites' />
       </div>
       <div className='row'>
-        <MovieList movies={favourites} favouriteComponent={AddToFavourites} />
+        <MovieList 
+          movies={favourites} 
+          handleFavouritesClick={removeFavouriteMovie}
+          favouriteComponent={RemoveFavourites} 
+        />
       </div>
     </div>
   );
