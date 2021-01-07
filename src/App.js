@@ -13,7 +13,7 @@ const App = () => {
   const [searchValue, setSearchValue] = useState('')
   const [favourites, setFavourites] = useState([])
 
-  const getMovieRequest = async () => {
+  const getMovieRequest = async (searchValue) => {
     const url = `http://www.omdbapi.com/?s=${searchValue}&apikey=8658255f`
 
     const response = await fetch(url)
@@ -24,9 +24,29 @@ const App = () => {
     }
   }
 
+  //side effect, makes the call only one time
+  useEffect(() => {
+    getMovieRequest(searchValue) //when the useEffect runs is passes the new search value to getMoviesRequest
+  }, [searchValue])   //runs whenever the searchValue is updated 
+
+  useEffect(() => {
+    const movieFavourites = JSON.parse(
+      localStorage.getItem('react-movie-app-favourites')
+    )
+    if(movieFavourites){
+
+    setFavourites(movieFavourites)
+    }
+  },[])
+
+  const saveToLocalStorage = (items) => {
+    localStorage.setItem('react-movie-app-favourites', JSON.stringify(items))
+  }
+
   const addFavouriteMovie = (movie) => {
     const newFavouriteList = [...favourites, movie]
     setFavourites(newFavouriteList)
+    saveToLocalStorage(newFavouriteList)
   }
 
   const removeFavouriteMovie = (movie) => {
@@ -34,11 +54,9 @@ const App = () => {
       (favourite) => favourite.imdbID !== movie.imdbID
     )
     setFavourites(newFavouriteList)
+    saveToLocalStorage(newFavouriteList)
   }
-  //side effect, makes the call only one time
-  useEffect(() => {
-    getMovieRequest(searchValue) //when the useEffect runs is passes the new search value to getMoviesRequest
-  }, [searchValue])   //runs whenever the searchValue is updated 
+
   return (
     <div className="container-fluid movie-app">
       <div className='row d-flex align-items-center mt-4 mb-4'>
@@ -48,9 +66,9 @@ const App = () => {
       <div className='row'>
        <MovieList 
         movies={movies} 
-        favouriteComponent={AddToFavourites}
         handleFavouritesClick={addFavouriteMovie}
-      />
+        favouriteComponent={AddToFavourites}
+        />
       </div>
       <div className='row d-flex align-items-center mt-4 mb-4'>
         <MovieListHeading heading='favourites' />
