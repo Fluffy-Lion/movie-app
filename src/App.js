@@ -4,10 +4,13 @@ import './App.css';
 import MovieList from './components/MovieList'
 import MovieListHeading from './components/MovieListHeading'
 import SearchBox from './components/SearchBox'
+import AddToFavourites from './components/AddToFavourites'
 
 const App = () => {
+  //    currentstate , function that updates it
   const [movies, setMovies] = useState([])
   const [searchValue, setSearchValue] = useState('')
+  const [favourites, setFavourites] = useState([])
 
   const getMovieRequest = async () => {
     const url = `http://www.omdbapi.com/?s=${searchValue}&apikey=8658255f`
@@ -20,13 +23,14 @@ const App = () => {
     }
   }
 
-  //side effect
-  //makes the call only one time
-  //runs whenever the searchValue is updated 
-  //when the useeffect runs is passes the new search value to getMoviesRequest
+  const addFavouriteMovie = (movie) => {
+    const newFavouriteList = [...favourites, movie]
+    setFavourites(newFavouriteList)
+  }
+  //side effect, makes the call only one time
   useEffect(() => {
-    getMovieRequest(searchValue)
-  }, [searchValue])
+    getMovieRequest(searchValue) //when the useEffect runs is passes the new search value to getMoviesRequest
+  }, [searchValue])   //runs whenever the searchValue is updated 
   return (
     <div className="container-fluid movie-app">
       <div className='row d-flex align-items-center mt-4 mb-4'>
@@ -34,10 +38,20 @@ const App = () => {
         <SearchBox searchValue={searchValue} setSearchValue={setSearchValue}/>
       </div>
       <div className='row'>
-      <MovieList movies={movies}/>
+       <MovieList 
+        movies={movies} 
+        favouriteComponent={AddToFavourites}
+        handleFavouritesClick={addFavouriteMovie}
+      />
+      </div>
+      <div className='row d-flex align-items-center mt-4 mb-4'>
+        <MovieListHeading heading='favourites' />
+      </div>
+      <div className='row'>
+        <MovieList movies={favourites} favouriteComponent={AddToFavourites} />
       </div>
     </div>
   );
-}
+} 
 
 export default App;
